@@ -1,0 +1,24 @@
+site_name: HUMMINGBOARD 8P EDGE AI
+site_author: Majestueux DJOSSOU
+
+theme:
+  name: readthedocs
+  language: fr
+  features:
+    - navigation.sections
+    - content.code.copy
+
+nav:
+  - Accueil: index.md
+  - 1. Génération et installation de l'image: 01_generation_image.md
+  - 2. Connexion réseau (Wi-Fi): 02_reseau.md
+  - 3. Docker et ROS 2: 03_docker_ros2.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
