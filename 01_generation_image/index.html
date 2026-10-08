@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Majestueux DJOSSOU" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>1. Génération et installation de l'image - HUMMINGBOARD 8P EDGE AI</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "1. G\u00e9n\u00e9ration et installation de l\u0027image";
+        var mkdocs_page_input_path = "01_generation_image.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> HUMMINGBOARD 8P EDGE AI
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Accueil</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">1. Génération et installation de l'image</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#prerequis">Prérequis</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-recuperer-les-scripts-de-build-solidrun">1. Récupérer les scripts de build SolidRun</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-configurer-le-build">2. Configurer le build</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-generer-limage">3. Générer l'image</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-flasher-la-carte-microsd">4. Flasher la carte microSD</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-demarrer-sur-la-carte">5. Démarrer sur la carte</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../02_reseau/">2. Connexion réseau (Wi-Fi)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../03_docker_ros2/">3. Docker et ROS 2</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">HUMMINGBOARD 8P EDGE AI</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">1. Génération et installation de l'image</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="generation-et-installation-de-limage">Génération et installation de l'image</h1>
+<p>L'image Debian de la carte est générée sur un PC à partir des commandes suivantes de build SolidRun, puis flashée sur une carte microSD.</p>
+<h2 id="prerequis">Prérequis</h2>
+<ul>
+<li>Un PC sous Linux avec Docker installé</li>
+<li>Une carte microSD (32 Go utilisés ici)</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Docker sans sudo</p>
+<p>L'utilisateur doit appartenir au groupe <code>docker</code> :</p>
+</div>
+<p><div class="highlight"><pre><span></span><code><span class="w">    </span>sudo<span class="w"> </span>usermod<span class="w"> </span>-aG<span class="w"> </span>docker<span class="w"> </span><span class="nv">$USER</span>
+</code></pre></div>
+    Puis se déconnecter et se reconnecter.</p>
+<h2 id="1-recuperer-les-scripts-de-build-solidrun">1. Récupérer les scripts de build SolidRun</h2>
+<p>La branche <code>develop-lf-6.6.52-2.2.0-imx8mp</code> est la version maintenue (SDK NXP 6.6.52, U-Boot v2024.04, Linux 6.6).</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>develop-lf-6.6.52-2.2.0-imx8mp<span class="w"> </span>https://github.com/SolidRun/imx8mp_build.git
+<span class="nb">cd</span><span class="w"> </span>imx8mp_build
+</code></pre></div>
+<h2 id="2-configurer-le-build">2. Configurer le build</h2>
+<p>Les options se trouvent au début du fichier <code>runme.sh</code> :</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Valeur par défaut</th>
+<th>Valeur choisie</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DISTRO</code></td>
+<td><code>buildroot</code></td>
+<td><code>debian</code></td>
+</tr>
+<tr>
+<td><code>DEBIAN_ROOTFS_SIZE</code></td>
+<td><code>936M</code></td>
+<td><code>8G</code></td>
+</tr>
+<tr>
+<td><code>DEBIAN_PACKAGES</code></td>
+<td>(liste des paquets)</td>
+<td>+ <code>wpasupplicant,iw,wireless-regdb,htop</code></td>
+</tr>
+</tbody>
+</table>
+<p>Lignes modifiées dans <code>runme.sh</code> :</p>
+<div class="highlight"><pre><span></span><code>:<span class="w"> </span><span class="si">${</span><span class="nv">DISTRO</span><span class="p">:=debian</span><span class="si">}</span>
+:<span class="w"> </span><span class="si">${</span><span class="nv">DEBIAN_ROOTFS_SIZE</span><span class="p">:=8G</span><span class="si">}</span>
+</code></pre></div>
+<p>Ajout des paquets à la fin de la ligne <code>DEBIAN_PACKAGES</code> :</p>
+<div class="highlight"><pre><span></span><code>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;s/xterm,xz-utils&quot;}/xterm,xz-utils,wpasupplicant,iw,wireless-regdb,htop&quot;}/&#39;</span><span class="w"> </span>runme.sh
+</code></pre></div>
+<h2 id="3-generer-limage">3. Générer l'image</h2>
+<p>Construire l'environnement de build (une seule fois) :</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>imx8mp_build<span class="w"> </span>docker
+</code></pre></div>
+<p>Lancer la génération de l'image :</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-i<span class="w"> </span>-t<span class="w"> </span>-v<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span>:/work<span class="w"> </span>imx8mp_build<span class="w"> </span>-u<span class="w"> </span><span class="k">$(</span>id<span class="w"> </span>-u<span class="k">)</span><span class="w"> </span>-g<span class="w"> </span><span class="k">$(</span>id<span class="w"> </span>-g<span class="k">)</span>
+</code></pre></div>
+<p>En fin de build, l'image est disponible dans <code>images/</code> :</p>
+<div class="highlight"><pre><span></span><code>images/debian-bootimg-&lt;hash&gt;.img
+</code></pre></div>
+<h2 id="4-flasher-la-carte-microsd">4. Flasher la carte microSD</h2>
+<p>Identifier la carte SD :</p>
+<div class="highlight"><pre><span></span><code>lsblk
+</code></pre></div>
+<p>Pour vérifier si la carte SD est bien listée dans les périphériques.</p>
+<p><div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>umount<span class="w"> </span>/dev/sdX*
+sudo<span class="w"> </span>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>images/debian-bootimg-&lt;hash&gt;.img<span class="w"> </span><span class="nv">of</span><span class="o">=</span>/dev/sdX<span class="w"> </span><span class="nv">bs</span><span class="o">=</span>4M<span class="w"> </span><span class="nv">status</span><span class="o">=</span>progress<span class="w"> </span><span class="nv">conv</span><span class="o">=</span>fsync
+sync
+sudo<span class="w"> </span>eject<span class="w"> </span>/dev/sdX
+</code></pre></div>
+Remplacer <code>sdX</code> par le nom du périphérique correspondant à la carte microSD.</p>
+<p>Après le flash, la SD contient deux partitions : le <code>boot</code> (~60 Mo) et le <code>rootfs</code> (~8 Go).</p>
+<h2 id="5-demarrer-sur-la-carte">5. Démarrer sur la carte</h2>
+<ol>
+<li>Configurer le boot select S3 pour la microSD : switches <strong>1 et 2 sur ON</strong>.</li>
+<li>Ouvrir la console série avec :
+<div class="highlight"><pre><span></span><code><span class="w">   </span>sudo<span class="w"> </span>minicom<span class="w"> </span>-b<span class="w"> </span><span class="m">115200</span><span class="w"> </span>-D<span class="w"> </span>/dev/ttyUSB0
+</code></pre></div></li>
+<li>Se connecter avec l'utilisateur <code>root</code> et le mot de passe par défaut : <code>root</code>.</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Accueil"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../02_reseau/" class="btn btn-neutral float-right" title="2. Connexion réseau (Wi-Fi)">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../02_reseau/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

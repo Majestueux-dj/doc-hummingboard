@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Majestueux DJOSSOU" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>3. Docker et ROS 2 - HUMMINGBOARD 8P EDGE AI</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "3. Docker et ROS 2";
+        var mkdocs_page_input_path = "03_docker_ros2.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> HUMMINGBOARD 8P EDGE AI
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Accueil</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../01_generation_image/">1. Génération et installation de l'image</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../02_reseau/">2. Connexion réseau (Wi-Fi)</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">3. Docker et ROS 2</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-installer-docker-sur-la-carte">1. Installer Docker sur la carte</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-telecharger-limage-ros-2">2. Télécharger l'image ROS 2</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-creer-le-conteneur-du-projet">3. Créer le conteneur du projet</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-installer-les-outils-de-base-dans-le-conteneur">4. Installer les outils de base dans le conteneur</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-utilisation-au-quotidien">5. Utilisation au quotidien</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">HUMMINGBOARD 8P EDGE AI</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">3. Docker et ROS 2</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="docker-et-ros-2">Docker et ROS 2</h1>
+<p>La carte fonctionne sous Debian. ROS 2, lui, est installé dans un conteneur Docker qui contient un système Ubuntu 22.04, isolé du reste de la carte.</p>
+<p>Ce conteneur n'a pas son propre noyau : il utilise celui de Debian. Il a donc accès au matériel de la carte (Wi-Fi, NPU, etc.) grâce aux drivers déjà présents dans Debian.</p>
+<h2 id="1-installer-docker-sur-la-carte">1. Installer Docker sur la carte</h2>
+<div class="highlight"><pre><span></span><code>apt<span class="w"> </span>update
+apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>docker.io
+systemctl<span class="w"> </span>status<span class="w"> </span>docker<span class="w">      </span><span class="c1"># affiche &quot;active (running)&quot;</span>
+</code></pre></div>
+<p>Docker démarre automatiquement à chaque démarrage de la carte (voir <code>.bashrc</code>)</p>
+<h2 id="2-telecharger-limage-ros-2">2. Télécharger l'image ROS 2</h2>
+<p>L'image officielle contient déjà Ubuntu 22.04 et ROS 2 Humble :</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>pull<span class="w"> </span>ros:humble-ros-base
+</code></pre></div>
+<h2 id="3-creer-le-conteneur-du-projet">3. Créer le conteneur du projet</h2>
+<p>Dossier de travail côté Debian :</p>
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>/root/project
+</code></pre></div>
+<p>Création du conteneur (<strong>une seule fois</strong>) :</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--name<span class="w"> </span>project_ros<span class="w"> </span>--network<span class="w"> </span>host<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span>/root/project:/project<span class="w"> </span>ros:humble-ros-base<span class="w"> </span>bash
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--name project_ros</code></td>
+<td>Nom du conteneur, pour le retrouver</td>
+</tr>
+<tr>
+<td><code>--network host</code></td>
+<td>Le conteneur utilise directement le réseau de la carte</td>
+</tr>
+<tr>
+<td><code>-v /root/project:/project</code></td>
+<td>Dossier partagé : les fichiers sont stockés côté Debian</td>
+</tr>
+<tr>
+<td>(pas de <code>--rm</code>)</td>
+<td>Le conteneur est conservé à la sortie</td>
+</tr>
+</tbody>
+</table>
+<p>Vérification dans le conteneur :</p>
+<div class="highlight"><pre><span></span><code>cat<span class="w"> </span>/etc/os-release<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-2<span class="w">   </span><span class="c1"># Ubuntu 22.04</span>
+ls<span class="w"> </span>/project
+ros2<span class="w"> </span>topic<span class="w"> </span>list<span class="w">                 </span><span class="c1"># affiche /parameter_events et /rosout</span>
+</code></pre></div>
+<h2 id="4-installer-les-outils-de-base-dans-le-conteneur">4. Installer les outils de base dans le conteneur</h2>
+<p>L'image ROS 2 est minimale. Outils ajoutés :</p>
+<div class="highlight"><pre><span></span><code>apt<span class="w"> </span>update
+apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>nano<span class="w"> </span>git<span class="w"> </span>python3-pip<span class="w"> </span>python3-colcon-common-extensions
+</code></pre></div>
+<p>Ces installations sont conservées, car le conteneur n'est pas supprimé.</p>
+<h2 id="5-utilisation-au-quotidien">5. Utilisation au quotidien</h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Commande</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Entrer dans le conteneur</td>
+<td><code>docker start -ai project_ros</code></td>
+</tr>
+<tr>
+<td>En sortir</td>
+<td><code>exit</code></td>
+</tr>
+<tr>
+<td>Lister les conteneurs</td>
+<td><code>docker ps -a</code></td>
+</tr>
+<tr>
+<td>Fichiers côté Debian</td>
+<td><code>/root/project/</code></td>
+</tr>
+<tr>
+<td>Fichiers côté Ubuntu</td>
+<td><code>/project/</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition danger">
+<p class="admonition-title">À éviter</p>
+<ul>
+<li>Ne <strong>pas</strong> relancer <code>docker run</code> pour ce conteneur : il existe déjà
+  (utiliser <code>docker start -ai project_ros</code>).</li>
+<li>Ne <strong>pas</strong> utiliser <code>docker container prune</code> : cette commande supprime
+  tous les conteneurs arrêtés, y compris <code>project_ros</code>.</li>
+</ul>
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../02_reseau/" class="btn btn-neutral float-left" title="2. Connexion réseau (Wi-Fi)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../02_reseau/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
